@@ -1,33 +1,11 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: aabourri <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/24 11:45:42 by aabourri          #+#    #+#             */
-/*   Updated: 2023/03/01 13:26:01 by aabourri         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 #include <string.h>
 
-char	*ft_strdup(const char *s1)
+void	find_leaks()
 {
-	char	*str;
-	int		len;
-
-	if (!s1)
-		return (NULL);
-	len = strlen(s1);
-	str = (char *)malloc((len + 1) * sizeof(char));
-	if (!str)
-		return (NULL);
-	memcpy(str, s1, len);
-	str[len] = '\0';
-	return (str);
+	system("leaks main");
 }
+
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
@@ -36,7 +14,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	size_t	len_s2;
 
 	if (!s1)
-		s1 = (char*)ft_strdup("");
+		s1 = "";
+	if (!s2)
+		s2 = "";
 	len_s1 = strlen(s1);
 	len_s2 = strlen(s2);
 	str = (char *)malloc((len_s1 + len_s2 + 1) * sizeof(char));
@@ -48,50 +28,79 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-
-char	*get_line(char *str)
+char	*get_line_buff(char *str)
 {
 	char	*line;
-	int		i;
+	int i;
 
 	i = 0;
 	while (str[i] != EOL && str[i] != '\0')
 		i++;
-	line = (char*)malloc(sizeof(char) + (i + 2));
+	if (i == 0)
+		return (NULL);
+	line = (char*)malloc(sizeof(char) * (i + 2));
+	if (!line)
+		return (NULL);
 	memcpy(line, str, i);
-	line[i] = '\n';
+	line[i] = EOL;
 	line[i + 1] = '\0';
 	return (line);
 }
 
+char	*ft_strchr(const char *s, int c)
+{
+	c = (unsigned char)c;
+	while ((*s != '\0') && (*s != c))
+		s++;
+	if (*s == c)
+		return ((char *)s);
+	return (NULL);
+}
+
 char	*get_next_line(int fd)
 {
-	char buff[BUFFER_SIZE + 1];
+	static char	*buffer = NULL;
+	char buff_read[BUFFER_SIZE + 1];
 	char *line;
 	int nbyte;
-	static char	*string;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	nbyte = 1;
 	while (nbyte > 0)
 	{
-		nbyte = read(fd, buff, BUFFER_SIZE);
-		buff[nbyte] = '\0';
-		string = ft_strjoin(string, buff);
+		nbyte = read(fd, buff_read, BUFFER_SIZE);
+		if (nbyte == -1)
+			return (NULL);
+		else
+		{
+			buff_read[nbyte] = '\0';
+			buffer = ft_strjoin(buffer, buff_read);
+		}
 	}
-	line = get_line(string);
-	string += strlen(line);
+	line = get_line_buff(buffer);
+	buffer = ft_strchr(buffer, '\n') + 1;
 	return (line);
 }
 
-int main()
+/*int main()
 {
+	atexit(find_leaks);
 	int fd = open("input.txt", O_RDONLY);
 	if (fd == -1)
 		printf("Could not open the file\n");
 	printf("%s", get_next_line(fd));
 	printf("%s", get_next_line(fd));
 	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(fd));
+	close(fd);
 	return 0;
-}
+}*/
+
+/*int main2()
+{
+	atexit(find_leaks);
+	char	*buff = "abc\n123\n321\ncba";
+	get_new_buff(buff);
+	return 0;
+}*/
