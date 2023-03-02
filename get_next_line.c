@@ -6,7 +6,6 @@ void	find_leaks()
 	system("leaks main");
 }
 
-
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*str;
@@ -15,8 +14,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	if (!s1)
 		s1 = "";
-	if (!s2)
-		s2 = "";
 	len_s1 = strlen(s1);
 	len_s2 = strlen(s2);
 	str = (char *)malloc((len_s1 + len_s2 + 1) * sizeof(char));
@@ -32,18 +29,21 @@ char	*get_line_buff(char *str)
 {
 	char	*line;
 	int i;
+	int j;
 
+	j = 0;
 	i = 0;
 	while (str[i] != EOL && str[i] != '\0')
 		i++;
-	if (i == 0)
-		return (NULL);
 	line = (char*)malloc(sizeof(char) * (i + 2));
 	if (!line)
 		return (NULL);
-	memcpy(line, str, i);
-	line[i] = EOL;
-	line[i + 1] = '\0';
+	while (j < (i + 1) && str[j] != '\0')
+	{
+		line[j] = str[j];
+		j++;
+	}
+	line[j] = '\0';
 	return (line);
 }
 
@@ -70,9 +70,9 @@ char	*get_next_line(int fd)
 	while (nbyte > 0)
 	{
 		nbyte = read(fd, buff_read, BUFFER_SIZE);
-		if (nbyte == -1)
-			return (NULL);
-		else
+		/*if (nbyte == -1)
+			return (NULL);*/
+		if (nbyte != 0)	
 		{
 			buff_read[nbyte] = '\0';
 			buffer = ft_strjoin(buffer, buff_read);
@@ -87,11 +87,8 @@ char	*get_next_line(int fd)
 {
 	atexit(find_leaks);
 	int fd = open("input.txt", O_RDONLY);
-	if (fd == -1)
-		printf("Could not open the file\n");
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
+	if (fd < 0)
+		printf("ERROR: could not open the file.");
 	printf("%s", get_next_line(fd));
 	close(fd);
 	return 0;
