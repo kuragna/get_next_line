@@ -3,7 +3,7 @@
 
 void	find_leaks()
 {
-	system("leaks main");
+	system("leaks -q main");
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -13,8 +13,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	size_t	len_s2;
 
 	if (!s1)
-		s1 = "";
-	len_s1 = strlen(s1);
+		len_s1 = 0;
+	else
+		len_s1 = strlen(s1);
 	len_s2 = strlen(s2);
 	str = (char *)malloc((len_s1 + len_s2 + 1) * sizeof(char));
 	if (!str)
@@ -25,7 +26,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-char	*get_line(char **ptr)
+char	*get_line_buff(char **ptr)
 {
 	char	*line;
 	int		i;
@@ -33,30 +34,22 @@ char	*get_line(char **ptr)
 
 	i = 0;
 	j = -1;
+	if ((*ptr) == NULL || *(*ptr) == '\0')
+		return (NULL);
 	while ((*ptr)[i] != '\n' && (*ptr)[i] != '\0')
 		i++;
-	line = (char*)malloc(sizeof(char) * (i + 2));
+	if ((*ptr)[i] == '\0')
+		i++;
+	else
+		i += 2;
+	line = (char*)malloc(sizeof(char) * i);
 	if (!line)
 		return (NULL);
-	while (++j < (i + 1))
+	while (++j < (i - 1))
 		line[j] = *(*ptr)++;
 	line[j] = '\0';
 	return (line);
 }
-
-char	*ft_strchr(const char *s, int c)
-{
-	c = (unsigned char)c;
-
-	if (!s)
-		return (NULL);
-	while ((*s != '\0') && (*s != c))
-		s++;
-	if (*s == c)
-		return ((char *)s);
-	return (NULL);
-}
-
 
 char	*get_next_line(int fd)
 {
@@ -64,7 +57,6 @@ char	*get_next_line(int fd)
 	char buff_read[BUFFER_SIZE + 1];
 	char *line;
 	int nbyte;
-	int nline;
 
 	if (fd < 0 || fd >= 1000 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -72,13 +64,13 @@ char	*get_next_line(int fd)
 	while (nbyte > 0)
 	{
 		nbyte = read(fd, buff_read, BUFFER_SIZE);
-		if (nbyte != 0)	
+		if (nbyte > 0)	
 		{
 			buff_read[nbyte] = '\0';
 			buffer = ft_strjoin(buffer, buff_read);
 		}
 	}
-	line = get_line_buff(buffer);
+	line = get_line_buff(&buffer);
 	return (line);
 }
 #if 0
@@ -88,8 +80,7 @@ int main()
 	int fd = open("input.txt", O_RDONLY);
 	if (fd < 0)
 		printf("ERROR: could not open the file.");
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
+	printf("%s", get_next_line(4));
 	close(fd);
 	return 0;
 }
