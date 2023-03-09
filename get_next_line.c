@@ -25,7 +25,7 @@ char	*get_line_(char **buffer)
 	size_t	i;
 
 	if (!*buffer || !**buffer)
-		return (free(*buffer), NULL);
+		return (NULL);
 	i = 0;
 	while ((*buffer)[i] != '\n' && (*buffer)[i] != '\0')
 		i++;
