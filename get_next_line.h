@@ -6,7 +6,7 @@
 /*   By: aabourri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 11:50:48 by aabourri          #+#    #+#             */
-/*   Updated: 2023/03/08 18:18:09 by aabourri         ###   ########.fr       */
+/*   Updated: 2023/03/11 20:24:53 by aabourri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@
 # include <fcntl.h>
 
 # ifndef BUFFER_SIZE
-# define BUFFER_SIZE 10
+#  define BUFFER_SIZE 1
 # endif
 
-char    *get_freed(char *ptr);
-char	*get_join(char *s1, char const *s2);
+char	*get_freed(char **p1, char **p2);
 char	*get_line_(char **buffer);
 char	*get_next_line(int fd);
+char	*get_join(char *s1, char *s2);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strchr(const char *s, int c);
 void	*ft_memcpy(void *dst, const void *src, size_t len);

@@ -6,26 +6,22 @@
 /*   By: aabourri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:01:41 by aabourri          #+#    #+#             */
-/*   Updated: 2023/03/08 18:29:03 by aabourri         ###   ########.fr       */
+/*   Updated: 2023/03/11 20:36:17 by aabourri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "get_next_line.h"
 #include <stdio.h>
-
-void	find_leaks(void)
-{
-	system("leaks -q main");
-}
 
 char	*get_line_(char **buffer)
 {
 	char	*line;
 	char	*tmp;
+	char	*null;
 	size_t	i;
 
+	null = NULL;
 	if (!*buffer || !**buffer)
-		return (NULL);
+		return (get_freed(buffer, &null));
 	i = 0;
 	while ((*buffer)[i] != '\n' && (*buffer)[i] != '\0')
 		i++;
@@ -39,7 +35,7 @@ char	*get_line_(char **buffer)
 	return (line);
 }
 
-char	*get_join(char *s1, char const *s2)
+char	*get_join(char *s1, char *s2)
 {
 	char	*str;
 	size_t	len_s1;
@@ -55,7 +51,7 @@ char	*get_join(char *s1, char const *s2)
 	else
 		len_s1 = ft_strlen(s1);
 	len_s2 = ft_strlen(s2);
-	str = malloc(sizeof *str * (len_s1 + len_s2 + 1));
+	str = malloc(sizeof(char) * (len_s1 + len_s2 + 1));
 	if (!str)
 		return (NULL);
 	ft_memcpy(str, s1, len_s1);
@@ -66,110 +62,73 @@ char	*get_join(char *s1, char const *s2)
 	return (str);
 }
 
-char	*get_freed(char *ptr)
-{
-	if (ptr != NULL)
-	{
-		free(ptr);
-		ptr = NULL;
-	}
-	return (NULL);
-}
-
 char	*get_next_line(int fd)
 {
 	static char	*buffer;
-	char		buff_read[BUFFER_SIZE + 1];
+	char		*buff_read;
 	int			nbyte;
 
-	if (fd < 0  || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	nbyte = 1;
+	buff_read = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	while (nbyte > 0)
 	{
 		nbyte = read(fd, buff_read, BUFFER_SIZE);
 		if (nbyte == -1)
-			return (free(buffer), NULL);
+			return (get_freed(&buffer, &buff_read));
 		if (nbyte > 0)
 		{
 			buff_read[nbyte] = '\0';
 			buffer = get_join(buffer, buff_read);
+			if (!buffer)
+				return (get_freed(&buffer, &buff_read));
 			if (ft_strchr(buffer, '\n'))
 				break ;
 		}
 	}
-
+	free(buff_read);
 	return (get_line_(&buffer));
 }
-#if 0 
+#if 1
+void	find_leaks()
+{
+	system("leaks -q main");
+}
 int main()
 {
 	atexit(find_leaks);
 	int fd = open("input.txt", O_RDONLY);
 	if (fd < 0)
 		printf("ERROR: could not open the file.");
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
+	char	*s;
+	while ((s = get_next_line(fd)))
+	{
+		printf("%s", s);
+		free(s);
+	}
+	int i = 0;
+	while (i < 10)
+	{
+		printf("%s", get_next_line(fd));
+		i++;
+	}
 	close(fd);
 	return 0;
 }
 #endif
 
-size_t	ft_strlen(const char *s)
+char	*get_freed(char **p1, char **p2)
 {
-	size_t	len;
-
-	len = 0;
-	while (s[len] != '\0')
-		len++;
-	return (len);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*str;
-	size_t	len_s;
-
-	if (!s)
-		return (NULL);
-	len_s = ft_strlen(s);
-	if (start > len_s)
-		len = 0;
-	if (len_s < len)
-		len = len_s - start;
-	str = (char *)malloc((len + 1) * sizeof(char));
-	if (!str)
-		return (NULL);
-	ft_memcpy(str, s + start, len);
-	str[len] = '\0';
-	return (str);
-}
-
-void	*ft_memcpy(void *dst, const void *src, size_t n)
-{
-	size_t	i;
-
-	if (!dst && !src)
-		return (NULL);
-	i = 0;
-	while (i < n)
+	if (*p1 != NULL)
 	{
-		*((char *)dst + i) = *((char *)src + i);
-		i++;
+		free(*p1);
+		*p1 = NULL;
 	}
-	return (dst);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	c = (unsigned char)c;
-	while ((*s != '\0') && (*s != c))
-		s++;
-	if (*s == c)
-		return ((char *)s);
+	if (*p2 != NULL)
+	{
+		free(*p2);
+		*p2 = NULL;
+	}
 	return (NULL);
 }
