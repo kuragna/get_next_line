@@ -6,7 +6,7 @@
 /*   By: aabourri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 11:50:48 by aabourri          #+#    #+#             */
-/*   Updated: 2023/03/17 17:40:47 by aabourri         ###   ########.fr       */
+/*   Updated: 2023/03/21 13:23:41 by aabourri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,7 @@
 #  define BUFFER_SIZE 1
 # endif
 
-char	*get_freed(char **p1, char **p2);
-void	*get_freed1(char **p1);
+void	*get_freed(char **p1, char **p2);
 char	*get_line_(char **buffer);
 char	*get_next_line(int fd);
 char	*get_join(char *s1, char *s2);

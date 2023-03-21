@@ -6,33 +6,23 @@
 /*   By: aabourri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 15:01:41 by aabourri          #+#    #+#             */
-/*   Updated: 2023/03/17 17:39:12 by aabourri         ###   ########.fr       */
+/*   Updated: 2023/03/21 13:23:40 by aabourri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
-char	*get_freed(char **p1, char **p2)
+void	*get_freed(char **p1, char **p2)
 {
-	if (*p1 != NULL)
+	if (p1 && *p1 != NULL)
 	{
 		free(*p1);
 		*p1 = NULL;
 	}
-	if (*p2 != NULL)
+	if (p2 && *p2 != NULL)
 	{
 		free(*p2);
 		*p2 = NULL;
-	}
-	return (NULL);
-}
-
-void	*get_freed1(char **p1)
-{
-	if (*p1 != NULL)
-	{
-		free(*p1);
-		*p1 = NULL;
 	}
 	return (NULL);
 }
@@ -44,7 +34,7 @@ char	*get_line_(char **buffer)
 	size_t	i;
 
 	if (!*buffer || !**buffer)
-		return (get_freed1(buffer));
+		return (get_freed(buffer, NULL));
 	i = 0;
 	while ((*buffer)[i] != '\n' && (*buffer)[i] != '\0')
 		i++;
@@ -53,11 +43,11 @@ char	*get_line_(char **buffer)
 	tmp = *buffer;
 	line = ft_substr(*buffer, 0, i);
 	if (!line)
-		return (get_freed1(buffer));
+		return (get_freed(buffer, NULL));
 	*buffer = ft_substr(*buffer, i, ft_strlen(*buffer + i));
 	if (!*buffer)
 		return (get_freed(&tmp, &line));
-	get_freed1(&tmp);
+	get_freed(&tmp, NULL);
 	return (line);
 }
 
@@ -78,7 +68,7 @@ char	*get_join(char *s1, char *s2)
 	ft_memcpy(str, s1, len_s1);
 	ft_memcpy(str + len_s1, s2, len_s2);
 	str[len_s2 + len_s1] = '\0';
-	get_freed1(&s1);
+	get_freed(&s1, NULL);
 	return (str);
 }
 
@@ -93,7 +83,7 @@ char	*get_next_line(int fd)
 	nbyte = 1;
 	buff_read = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buff_read)
-		return (get_freed1(&buffer));
+		return (get_freed(&buffer, NULL));
 	while (!ft_strchr(buffer, '\n') && nbyte > 0)
 	{
 		nbyte = read(fd, buff_read, BUFFER_SIZE);

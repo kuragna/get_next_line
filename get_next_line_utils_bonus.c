@@ -6,11 +6,11 @@
 /*   By: aabourri <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/08 14:57:55 by aabourri          #+#    #+#             */
-/*   Updated: 2023/03/16 15:01:12 by aabourri         ###   ########.fr       */
+/*   Updated: 2023/03/17 17:38:53 by aabourri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 size_t	ft_strlen(const char *s)
 {
